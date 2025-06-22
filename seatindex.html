@@ -1,706 +1,543 @@
-{\rtf1\ansi\ansicpg950\cocoartf2822
-\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;\f1\fnil\fcharset136 PingFangTC-Regular;}
-{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red255\green255\blue255;\red71\green138\blue206;
-\red141\green213\blue254;\red203\green203\blue202;\red109\green109\blue109;\red194\green125\blue100;\red212\green212\blue212;
-\red167\green197\blue151;\red112\green192\blue130;\red184\green113\blue248;\red109\green115\blue120;\red245\green123\blue47;
-\red54\green192\blue160;}
-{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;\cssrgb\c100000\c100000\c100000\c0;\cssrgb\c34146\c61677\c84338;
-\cssrgb\c61545\c86704\c99884;\cssrgb\c83320\c83320\c83112;\cssrgb\c50307\c50306\c50181;\cssrgb\c80772\c56796\c46790;\cssrgb\c86465\c86464\c86248;
-\cssrgb\c71035\c80830\c65726;\cssrgb\c50437\c78684\c58115;\cssrgb\c77746\c54642\c98035;\cssrgb\c50336\c52696\c54531;\cssrgb\c97756\c56070\c23668;
-\cssrgb\c23989\c78963\c69075;}
-\paperw11900\paperh16840\margl1440\margr1440\vieww12720\viewh7240\viewkind0
-\deftab720
-\pard\pardeftab720\partightenfactor0
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gloria老師導師班座位表</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f3f4f6;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            padding: 2rem 1rem;
+        }
+        .container {
+            margin: 0 auto;
+        }
+        #main-title {
+            background-image: linear-gradient(to right, #8b5cf6, #3b82f6);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            display: inline-block;
+            font-size: 1.875rem;
+            font-weight: bold;
+        }
+        .seat, .unusable-seat {
+            width: 110px;
+            height: 90px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0.3rem;
+            border-radius: 0.375rem;
+            overflow: hidden;
+            word-break: break-word;
+        }
+        .seat {
+            border: 1px solid #9ca3af;
+            flex-direction: column;
+            background-color: #fff;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            position: relative; 
+        }
+        .unusable-seat {
+            border: 1px solid #d1d5db;
+            background-color: #e5e7eb;
+            color: #6b7280;
+            font-style: italic;
+            font-size: 0.875rem;
+        }
+        .student-id {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #4b5563;
+            margin-bottom: 0.2rem; 
+        }
+        .student-name {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        .empty-seat-placeholder {
+            width: 110px;
+            height: 90px;
+            border: 1px dashed #d1d5db; 
+            background-color: #f9fafb; 
+            border-radius: 0.375rem; 
+        }
+        .podium {
+            width: 100%;
+            height: 40px;
+            background-color: #8b5cf6;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 0.375rem; 
+            margin-top: 1.5rem; 
+            font-weight: 600; 
+            font-size: 1.125rem; 
+        }
+        select, button {
+            border-radius: 0.375rem; 
+            border: 1px solid #d1d5db; 
+            padding: 0.5rem 0.75rem;
+            transition: box-shadow 0.15s ease-in-out, background-color 0.15s ease-in-out;
+        }
+        select:focus, button:focus {
+            outline: none;
+            border-color: #2563eb; 
+            box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25); 
+        }
+        button.action-button { 
+            background-color: #3b82f6; 
+            color: white;
+            font-weight: 500;
+        }
+        button.action-button:hover { background-color: #2563eb; }
+        button.secondary-button {
+            background-color: #6b7280; 
+            color: white;
+        }
+        button.secondary-button:hover { background-color: #4b5563; }
+        .control-group label {
+            display: block;
+            margin-bottom: 0.25rem;
+            font-weight: 500;
+            color: #374151; 
+        }
+        .seat.selected-for-swap {
+            border: 2px solid #ef4444; 
+            background-color: #fee2e2; 
+        }
+        .seat.manual-adjust-active:hover {
+            background-color: #dbeafe; 
+            cursor: pointer;
+        }
+        #teacher-name-display {
+            font-weight: bold;
+            background-color: #fbcfe8;
+            color: #9d174d;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            display: inline-block;
+        }
+        #warning-text-explicit {
+            font-style: italic;
+            font-weight: bold;
+            color: #c2410c;
+            background-color: #fef08a;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            margin-top: 0.5rem;
+            text-align: center;
+            border: 1px solid #facc15;
+        }
 
-\f0\fs28 \cf2 \cb3 \expnd0\expndtw0\kerning0
-<!DOCTYPE html>\
-\pard\pardeftab720\partightenfactor0
-\cf2 <html lang="zh-TW">\
-<head>\
-    <meta charset="UTF-8">\
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">\
-    <title>Gloria
-\f1 \'a6\'d1\'ae\'76\'be\'c9\'ae\'76\'af\'5a\'ae\'79\'a6\'ec\'aa\'ed
-\f0 </title>\
-    <script src="https://cdn.tailwindcss.com"></script>\
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">\
-    <style>\
-        html, body \{\
-            min-height: 100vh;\
-            margin: 0;\
-            background-color: #f3f4f6;\
-        \}\
-        body \{\
-            font-family: 'Inter', sans-serif;\
-            padding: 2rem 1rem;\
-        \}\
-        .container \{\
-            margin: 0 auto;\
-        \}\
-        #main-title \{\
-            background-image: linear-gradient(to right, #8b5cf6, #3b82f6);\
-            color: white;\
-            padding: 0.75rem 1.5rem;\
-            border-radius: 0.5rem;\
-            display: inline-block;\
-            font-size: 1.875rem;\
-            font-weight: bold;\
-        \}\
-        .seat, .unusable-seat \{\
-            width: 110px;\
-            height: 90px;\
-            display: flex;\
-            justify-content: center;\
-            align-items: center;\
-            text-align: center;\
-            padding: 0.3rem;\
-            border-radius: 0.375rem;\
-            overflow: hidden;\
-            word-break: break-word;\
-        \}\
-        .seat \{\
-            border: 1px solid #9ca3af;\
-            flex-direction: column;\
-            background-color: #fff;\
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);\
-            position: relative; \
-        \}\
-        .unusable-seat \{\
-            border: 1px solid #d1d5db;\
-            background-color: #e5e7eb;\
-            color: #6b7280;\
-            font-style: italic;\
-            font-size: 0.875rem;\
-        \}\
-        .student-id \{\
-            font-size: 0.85rem;\
-            font-weight: 600;\
-            color: #4b5563;\
-            margin-bottom: 0.2rem; \
-        \}\
-        .student-name \{\
-            font-size: 1rem;\
-            font-weight: 700;\
-            color: #1f2937;\
-        \}\
-        .empty-seat-placeholder \{\
-            width: 110px;\
-            height: 90px;\
-            border: 1px dashed #d1d5db; \
-            background-color: #f9fafb; \
-            border-radius: 0.375rem; \
-        \}\
-        .podium \{\
-            width: 100%;\
-            height: 40px;\
-            background-color: #8b5cf6;\
-            color: white;\
-            display: flex;\
-            justify-content: center;\
-            align-items: center;\
-            border-radius: 0.375rem; \
-            margin-top: 1.5rem; \
-            font-weight: 600; \
-            font-size: 1.125rem; \
-        \}\
-        select, button \{\
-            border-radius: 0.375rem; \
-            border: 1px solid #d1d5db; \
-            padding: 0.5rem 0.75rem;\
-            transition: box-shadow 0.15s ease-in-out, background-color 0.15s ease-in-out;\
-        \}\
-        select:focus, button:focus \{\
-            outline: none;\
-            border-color: #2563eb; \
-            box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25); \
-        \}\
-        button.action-button \{ \
-            background-color: #3b82f6; \
-            color: white;\
-            font-weight: 500;\
-        \}\
-        button.action-button:hover \{ background-color: #2563eb; \}\
-        button.secondary-button \{\
-            background-color: #6b7280; \
-            color: white;\
-        \}\
-        button.secondary-button:hover \{ background-color: #4b5563; \}\
-        .control-group label \{\
-            display: block;\
-            margin-bottom: 0.25rem;\
-            font-weight: 500;\
-            color: #374151; \
-        \}\
-        .seat.selected-for-swap \{\
-            border: 2px solid #ef4444; \
-            background-color: #fee2e2; \
-        \}\
-        .seat.manual-adjust-active:hover \{\
-            background-color: #dbeafe; \
-            cursor: pointer;\
-        \}\
-        #teacher-name-display \{\
-            font-weight: bold;\
-            background-color: #fbcfe8;\
-            color: #9d174d;\
-            padding: 0.5rem 0.75rem;\
-            border-radius: 0.375rem;\
-            display: inline-block;\
-        \}\
-        #warning-text-explicit \{\
-            font-style: italic;\
-            font-weight: bold;\
-            color: #c2410c;\
-            background-color: #fef08a;\
-            padding: 0.5rem 0.75rem;\
-            border-radius: 0.375rem;\
-            margin-top: 0.5rem;\
-            text-align: center;\
-            border: 1px solid #facc15;\
-        \}\
-\
-        @media print \{\
-            body \{ display: block; padding: 0; background-color: #fff; \}\
-            body * \{ visibility: hidden; \}\
-            .printable-area, .printable-area * \{ visibility: visible; \}\
-            .printable-area \{\
-                position: absolute;\
-                left: 0;\
-                top: 0;\
-                width: 100%;\
-                margin: 0;\
-                padding: 20px !important;\
-            \}\
-            .controls-container, #main-title-wrapper, .action-buttons-container, #chart-notification \{ display: none !important; \}\
-            .podium \{\
-                background-color: #8b5cf6 !important; \
-                color: white !important;\
-                -webkit-print-color-adjust: exact;\
-                color-adjust: exact;\
-            \}\
-            .seat \{\
-                border: 1px solid #000 !important;\
-                background-color: #fff !important;\
-                page-break-inside: avoid;\
-                box-shadow: none !important;\
-                width: 90px !important;\
-                height: 75px !important;\
-            \}\
-            .student-id \{ font-size: 0.7rem !important; \}\
-            .student-name \{ font-size: 0.85rem !important; \}\
-            .unusable-seat \{\
-                border: 1px solid #ccc !important;\
-                background-color: #e5e7eb !important;\
-                color: #6b7280 !important;\
-                -webkit-print-color-adjust: exact;\
-                color-adjust: exact;\
-                font-size: 0.75rem !important;\
-            \}\
-            .empty-seat-placeholder \{\
-                border: 1px dashed #ccc !important;\
-                background-color: #f9fafb !important;\
-            \}\
-            #main-title \{\
-                background-image: linear-gradient(to right, #8b5cf6, #3b82f6) !important;\
-                -webkit-print-color-adjust: exact;\
-                color-adjust: exact;\
-            \}\
-            h2 \{\
-                text-align: center !important; \
-                margin-bottom: 0.5rem !important;\
-            \}\
-            #teacher-name-display \{\
-                background-color: #fbcfe8 !important;\
-                color: #9d174d !important;\
-                -webkit-print-color-adjust: exact;\
-                color-adjust: exact;\
-                padding: 0.25rem 0.5rem !important;\
-                font-size: 0.9rem !important;\
-            \}\
-            #warning-text-explicit \{\
-                background-color: #fef08a !important;\
-                color: #c2410c !important;\
-                -webkit-print-color-adjust: exact;\
-                color-adjust: exact;\
-                font-size: 0.8rem !important;\
-                padding: 0.25rem 0.5rem !important;\
-                margin-top: 0.25rem !important;\
-            \}\
-            #seating-chart-container \{\
-                gap: 0.2rem !important; \
-                padding-top: 0.5rem !important;\
-            \}\
-        \}\
-    </style>\
-</head>\
-<body>\
-    <div class="container max-w-6xl bg-white p-6 rounded-lg shadow-xl">\
-        <header id="main-title-wrapper" class="text-center mb-6">\
-            <h1 id="main-title">Gloria
-\f1 \'a6\'d1\'ae\'76\'be\'c9\'ae\'76\'af\'5a\'ae\'79\'a6\'ec\'aa\'ed
-\f0 </h1>\
-        </header>\
-        \
-        <div class="controls-container mb-8 p-4 border border-gray-200 rounded-lg bg-gray-50">\
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-6">\
-                <!-- Left Column for Controls -->\
-                <div class="space-y-4">\
-                    <div class="control-group">\
-                        <label for="month-select" class="text-gray-700">
-\f1 \'bf\'ef\'be\'dc\'a4\'eb\'a5\'f7\'a1\'47
-\f0 </label>\
-                        <select id="month-select" class="w-full">\
-                            <option value="1">
-\f1 \'a4\'40\'a4\'eb
-\f0 </option><option value="2">
-\f1 \'a4\'47\'a4\'eb
-\f0 </option><option value="3">
-\f1 \'a4\'54\'a4\'eb
-\f0 </option>\
-                            <option value="4">
-\f1 \'a5\'7c\'a4\'eb
-\f0 </option><option value="5">
-\f1 \'a4\'ad\'a4\'eb
-\f0 </option><option value="6">
-\f1 \'a4\'bb\'a4\'eb
-\f0 </option>\
-                            <option value="7">
-\f1 \'a4\'43\'a4\'eb
-\f0 </option><option value="8">
-\f1 \'a4\'4b\'a4\'eb
-\f0 </option><option value="9">
-\f1 \'a4\'45\'a4\'eb
-\f0 </option>\
-                            <option value="10">
-\f1 \'a4\'51\'a4\'eb
-\f0 </option><option value="11">
-\f1 \'a4\'51\'a4\'40\'a4\'eb
-\f0 </option><option value="12">
-\f1 \'a4\'51\'a4\'47\'a4\'eb
-\f0 </option>\
-                        </select>\
-                    </div>\
-                    <div class="control-group">\
-                        <label class="text-gray-700">
-\f1 \'c0\'75\'a5\'fd\'b1\'c6\'a6\'62\'ab\'65\'ad\'b1\'be\'c7\'a5\'cd
-\f0  (
-\f1 \'b3\'cc\'a6\'68
-\f0 3
-\f1 \'a6\'ec
-\f0 ):</label>\
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">\
-                            <select id="priority-front-1"><option value="">-- 
-\f1 \'b5\'4c
-\f0  --</option></select>\
-                            <select id="priority-front-2"><option value="">-- 
-\f1 \'b5\'4c
-\f0  --</option></select>\
-                            <select id="priority-front-3"><option value="">-- 
-\f1 \'b5\'4c
-\f0  --</option></select>\
-                        </div>\
-                    </div>\
-                </div>\
-                <!-- Right Column for Controls -->\
-                <div class="space-y-4">\
-                    <div class="control-group">\
-                        <label class="text-gray-700">
-\f1 \'c1\'d7\'a7\'4b\'ac\'db\'be\'46\'be\'c7\'a5\'cd
-\f0  (
-\f1 \'b2\'c4
-\f0 1
-\f1 \'b2\'d5
-\f0 ):</label>\
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">\
-                            <select id="avoid-1a"><option value="">-- 
-\f1 \'be\'c7\'a5\'cd
-\f0 A --</option></select>\
-                            <select id="avoid-1b"><option value="">-- 
-\f1 \'be\'c7\'a5\'cd
-\f0 B --</option></select>\
-                        </div>\
-                    </div>\
-                    <div class="control-group">\
-                        <label class="text-gray-700">
-\f1 \'c1\'d7\'a7\'4b\'ac\'db\'be\'46\'be\'c7\'a5\'cd
-\f0  (
-\f1 \'b2\'c4
-\f0 2
-\f1 \'b2\'d5
-\f0 ):</label>\
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">\
-                            <select id="avoid-2a"><option value="">-- 
-\f1 \'be\'c7\'a5\'cd
-\f0 C --</option></select>\
-                            <select id="avoid-2b"><option value="">-- 
-\f1 \'be\'c7\'a5\'cd
-\f0 D --</option></select>\
-                        </div>\
-                    </div>\
-                </div>\
-            </div>\
-\
-             <div class="action-buttons-container mt-6 flex flex-col sm:flex-row justify-center items-center gap-4">\
-                <button id="generate-chart-btn" class="action-button py-2 px-6 w-full sm:w-auto">
-\f1 \'b2\'a3\'a5\'cd\'ae\'79\'a6\'ec\'aa\'ed
-\f0 </button>\
-                <button id="manual-adjust-btn" class="secondary-button py-2 px-6 w-full sm:w-auto">
-\f1 \'a4\'e2\'b0\'ca\'bd\'d5\'be\'e3\'ae\'79\'a6\'ec
-\f0 </button>\
-                <button id="print-chart-btn" class="secondary-button py-2 px-6 w-full sm:w-auto">
-\f1 \'ae\'79\'a6\'ec\'aa\'ed\'a6\'43\'a6\'4c
-\f0 </button>\
-            </div>\
-        </div>\
-        \
-        <div id="chart-notification" class="mb-4 text-center text-red-600 font-medium"></div>\
-        \
-        <div class="printable-area">\
-            <h2 id="seating-chart-title" class="text-2xl font-semibold text-center mb-1 text-gray-700"></h2>\
-            <div class="text-center mb-2">\
-                <p id="teacher-name-display" class="text-lg">
-\f1 \'be\'c9\'ae\'76\'a1\'47
-\f0 Gloria 
-\f1 \'a7\'64\'a8\'71\'c4\'f5\'a6\'d1\'ae\'76
-\f0 </p>\
-            </div>\
-            <p id="warning-text-explicit">
-\f1 \'a5\'bc\'b8\'67\'be\'c9\'ae\'76\'b3\'5c\'a5\'69\'a1\'41\'c4\'59\'b8\'54\'a5\'f4\'b7\'4e\'a7\'f3\'b4\'ab\'ae\'79\'a6\'ec\'a1\'49\'a1\'49
-\f0 </p>\
-            \
-            <div id="seating-chart-container" class="grid gap-2 justify-center mt-6"></div>\
-            <div class="podium">
-\f1 \'b6\'c2\'aa\'4f
-\f0  / 
-\f1 \'c1\'bf\'a5\'78
-\f0 </div>\
-        </div>\
-    </div>\
-\
-    <script>\
-    (function() \{ // IIFE to prevent global scope pollution\
-        const students = [\
-            \{ id: "219008", name: "
-\f1 \'a7\'f5\'a9\'7c\'eb\'f7
-\f0 " \}, \{ id: "219022", name: "
-\f1 \'b3\'af\'ac\'66\'a6\'74
-\f0 " \}, \{ id: "219011", name: "
-\f1 \'aa\'4c\'aa\'51\'a8\'dd
-\f0 " \},\
-            \{ id: "219019", name: "
-\f1 \'b3\'a2\'ac\'66\'a7\'c2
-\f0 " \}, \{ id: "219020", name: "
-\f1 \'b3\'af\'a4\'cd\'a4\'e5
-\f0 " \}, \{ id: "219024", name: "
-\f1 \'b6\'c0\'ab\'c9\'b9\'c5
-\f0 " \},\
-            \{ id: "219029", name: "
-\f1 \'c4\'ac\'ab\'b3\'bb\'f4
-\f0 " \}, \{ id: "219016", name: "
-\f1 \'b3\'af\'d6\'f6\'b3\'cd
-\f0 " \}, \{ id: "219023", name: "
-\f1 \'b6\'c0\'ab\'61\'bf\'41
-\f0 " \},\
-            \{ id: "219021", name: "
-\f1 \'b3\'af\'ab\'ed\'d6\'f6
-\f0 " \}, \{ id: "219010", name: "
-\f1 \'aa\'4c\'a5\'bf\'b3\'d4
-\f0 " \}, \{ id: "219027", name: "
-\f1 \'c1\'c2\'b3\'d5\'a6\'77
-\f0 " \},\
-            \{ id: "219014", name: "
-\f1 \'aa\'4c\'b3\'d5\'ab\'c5
-\f0 " \}, \{ id: "219002", name: "
-\f1 \'a4\'fd\'ab\'c9\'f1\'5a
-\f0 " \}, \{ id: "219006", name: "
-\f1 \'a6\'b6\'ab\'db\'c0\'4d
-\f0 " \},\
-            \{ id: "219013", name: "
-\f1 \'aa\'4c\'ab\'61\'bf\'6f
-\f0 " \}, \{ id: "219018", name: "
-\f1 \'b3\'a2\'ab\'c9\'a8\'b0
-\f0 " \}, \{ id: "219015", name: "
-\f1 \'aa\'4c\'bc\'dd\'f8\'ca
-\f0 " \},\
-            \{ id: "219004", name: "
-\f1 \'a4\'fd\'b1\'4c\'a5\'e0
-\f0 " \}, \{ id: "219012", name: "
-\f1 \'aa\'4c\'ab\'61\'a7\'ca
-\f0 " \}, \{ id: "219001", name: "
-\f1 \'a7\'f9\'df\'4e\'b4\'fc
-\f0 " \},\
-            \{ id: "219005", name: "
-\f1 \'a4\'fd\'b8\'5b\'b5\'7b
-\f0 " \}, \{ id: "219003", name: "
-\f1 \'a4\'fd\'ad\'b3\'b6\'76
-\f0 " \}, \{ id: "219025", name: "
-\f1 \'b9\'f9\'ae\'ca\'a6\'f6
-\f0 " \},\
-            \{ id: "219026", name: "
-\f1 \'c1\'c2\'a9\'7c\'bf\'d9
-\f0 " \}, \{ id: "219017", name: "
-\f1 \'b2\'f8\'a4\'e5\'a5\'dd
-\f0 " \}, \{ id: "219009", name: "
-\f1 \'a7\'f5\'ab\'db\'a7\'ca
-\f0 " \}\
-        ];\
-\
-        // Seat configuration: 6 columns x 5 rows\
-        const seatConfig = [ \
-            \{ seats: 6, isFront: true \}, \
-            \{ seats: 6, isFront: true \}, \
-            \{ seats: 6, isFront: false \},\
-            \{ seats: 6, isFront: false \}, \
-            \{ seats: 6, isFront: false \}\
-        ];\
-        const MAX_COLS = 6; \
-        // First column (c:0), first seat (r:0) and fifth seat (r:4) are unusable\
-        const unusableSeats = [\{ r: 0, c: 0 \}, \{ r: 4, c: 0 \}]; \
-\
-        // DOM Elements\
-        const monthSelect = document.getElementById('month-select');\
-        const seatingChartTitle = document.getElementById('seating-chart-title');\
-        const seatingChartContainer = document.getElementById('seating-chart-container');\
-        const generateBtn = document.getElementById('generate-chart-btn');\
-        const notificationArea = document.getElementById('chart-notification');\
-        const manualAdjustBtn = document.getElementById('manual-adjust-btn');\
-        const printBtn = document.getElementById('print-chart-btn');\
-        const prioritySelects = [\
-            document.getElementById('priority-front-1'),\
-            document.getElementById('priority-front-2'),\
-            document.getElementById('priority-front-3')\
-        ];\
-        const avoidSelects = [\
-            \{ a: document.getElementById('avoid-1a'), b: document.getElementById('avoid-1b') \},\
-            \{ a: document.getElementById('avoid-2a'), b: document.getElementById('avoid-2b') \}\
-        ];\
-\
-        let currentChartData = []; \
-        let isManualAdjustMode = false;\
-        let firstSelectedSeatForSwap = null; \
-\
-        // Utility & Core Functions\
-        const isUnusable = (r, c) => unusableSeats.some(seat => seat.r === r && seat.c === c);\
-        const shuffleArray = (array) => \{\
-            for (let i = array.length - 1; i > 0; i--) \{\
-                const j = Math.floor(Math.random() * (i + 1));\
-                [array[i], array[j]] = [array[j], array[i]];\
-            \}\
-        \};\
-\
-        function populateStudentDropdowns() \{\
-            const studentNames = students.map(s => s.name);\
-            const allDropdowns = [...prioritySelects, ...avoidSelects.flatMap(p => [p.a, p.b])];\
-            allDropdowns.forEach(select => \{\
-                if (!select) return;\
-                const currentValue = select.value;\
-                select.innerHTML = `<option value="">$\{select.children[0].textContent\}</option>`; // Keep placeholder\
-                studentNames.forEach(name => \{\
-                    select.innerHTML += `<option value="$\{name\}">$\{name\}</option>`;\
-                \});\
-                select.value = currentValue;\
-            \});\
-        \}\
-\
-        function updateChartTitle() \{\
-            seatingChartTitle.textContent = `$\{monthSelect.value\}
-\f1 \'a4\'eb\'a5\'f7
-\f0  Gloria
-\f1 \'a6\'d1\'ae\'76\'be\'c9\'ae\'76\'af\'5a\'ae\'79\'a6\'ec\'aa\'ed
-\f0 `;\
-        \}\
-        \
-        function displayChart(chartToDisplay) \{\
-            currentChartData = chartToDisplay; \
-            seatingChartContainer.innerHTML = ''; \
-            seatingChartContainer.style.gridTemplateColumns = `repeat($\{MAX_COLS\}, minmax(0, 1fr))`;\
-\
-            chartToDisplay.forEach((rowStudents, rowIndex) => \{\
-                for (let colIndex = 0; colIndex < MAX_COLS; colIndex++) \{\
-                    const seatDiv = document.createElement('div');\
-                    seatDiv.dataset.row = rowIndex;\
-                    seatDiv.dataset.col = colIndex;\
-\
-                    if (colIndex < seatConfig[rowIndex].seats) \{ \
-                        if (isUnusable(rowIndex, colIndex)) \{\
-                            seatDiv.className = 'unusable-seat';\
-                            seatDiv.textContent = '
-\f1 \'a4\'a3\'b1\'c6\'a6\'ec
-\f0 ';\
-                        \} else \{\
-                            seatDiv.className = 'seat';\
-                            const studentObject = rowStudents[colIndex];\
-                            if (studentObject) \{\
-                                seatDiv.innerHTML = `<span class="student-id">$\{studentObject.id\}</span><span class="student-name">$\{studentObject.name\}</span>`;\
-                            \} else \{\
-                                seatDiv.classList.add('bg-gray-100'); \
-                            \}\
-                            if (isManualAdjustMode) \{\
-                                seatDiv.classList.add('manual-adjust-active');\
-                                seatDiv.addEventListener('click', () => handleSeatClick(rowIndex, colIndex));\
-                            \}\
-                            if (firstSelectedSeatForSwap && firstSelectedSeatForSwap.r === rowIndex && firstSelectedSeatForSwap.c === colIndex) \{\
-                                seatDiv.classList.add('selected-for-swap');\
-                            \}\
-                        \}\
-                    \} else \{ \
-                        seatDiv.className = 'empty-seat-placeholder';\
-                    \}\
-                    seatingChartContainer.appendChild(seatDiv);\
-                \}\
-            \});\
-        \}\
-\
-        function handleSeatClick(r, c) \{\
-            if (!isManualAdjustMode || isUnusable(r,c)) return; \
-            const clickedSeatDiv = seatingChartContainer.querySelector(`[data-row='$\{r\}'][data-col='$\{c\}']`);\
-\
-            if (!firstSelectedSeatForSwap) \{\
-                firstSelectedSeatForSwap = \{ r, c, div: clickedSeatDiv \};\
-                clickedSeatDiv.classList.add('selected-for-swap');\
-            \} else \{\
-                if (firstSelectedSeatForSwap.r === r && firstSelectedSeatForSwap.c === c) \{\
-                    firstSelectedSeatForSwap.div.classList.remove('selected-for-swap');\
-                    firstSelectedSeatForSwap = null;\
-                    return;\
-                \}\
-\
-                const student1 = currentChartData[firstSelectedSeatForSwap.r][firstSelectedSeatForSwap.c];\
-                const student2 = currentChartData[r][c];\
-                currentChartData[firstSelectedSeatForSwap.r][firstSelectedSeatForSwap.c] = student2;\
-                currentChartData[r][c] = student1;\
-\
-                firstSelectedSeatForSwap.div.classList.remove('selected-for-swap');\
-                firstSelectedSeatForSwap = null;\
-                displayChart(currentChartData); \
-            \}\
-        \}\
-\
-        function toggleManualAdjustMode() \{\
-            isManualAdjustMode = !isManualAdjustMode;\
-            manualAdjustBtn.textContent = isManualAdjustMode ? '
-\f1 \'a7\'b9\'a6\'a8\'bd\'d5\'be\'e3
-\f0 ' : '
-\f1 \'a4\'e2\'b0\'ca\'bd\'d5\'be\'e3\'ae\'79\'a6\'ec
-\f0 ';\
-            manualAdjustBtn.classList.toggle('action-button', isManualAdjustMode); \
-            manualAdjustBtn.classList.toggle('secondary-button', !isManualAdjustMode);\
-            firstSelectedSeatForSwap = null; \
-            displayChart(currentChartData); \
-        \}\
-\
-        function isPlacementValid(studentObj, r, c, chartLayout, avoidPairs) \{\
-            if (isUnusable(r,c)) return false;\
-            const neighbors = [\{ dr: -1, dc: 0 \}, \{ dr: 1, dc: 0 \}, \{ dr: 0, dc: -1 \}, \{ dr: 0, dc: 1 \}];\
-            for (const neighbor of neighbors) \{\
-                const nr = r + neighbor.dr;\
-                const nc = c + neighbor.dc;\
-                if (nr >= 0 && nr < chartLayout.length && nc >= 0 && nc < MAX_COLS) \{\
-                    if (nc < seatConfig[nr].seats && !isUnusable(nr, nc)) \{\
-                        const neighborStudentObj = chartLayout[nr][nc];\
-                        if (neighborStudentObj) \{ \
-                            for (const pair of avoidPairs) \{\
-                                if ((pair.student1Name === studentObj.name && pair.student2Name === neighborStudentObj.name) ||\
-                                    (pair.student2Name === studentObj.name && pair.student1Name === neighborStudentObj.name)) \{\
-                                    return false; \
-                                \}\
-                            \}\
-                        \}\
-                    \}\
-                \}\
-            \}\
-            return true; \
-        \}\
-        \
-        function generateSeatingChart() \{\
-            notificationArea.textContent = ''; \
-            const \{ priorityFrontNames, avoidPairs \} = \{\
-                priorityFrontNames: prioritySelects.map(s => s.value).filter(Boolean),\
-                avoidPairs: avoidSelects.map(p => (p.a.value && p.b.value && p.a.value !== p.b.value) ? \{ student1Name: p.a.value, student2Name: p.b.value \} : null).filter(Boolean)\
-            \};\
-            \
-            let studentsToPlace = [...students]; \
-            const newChart = seatConfig.map(() => Array(MAX_COLS).fill(null));\
-\
-            priorityFrontNames.forEach(name => \{\
-                const studentObj = students.find(s => s.name === name);\
-                if (!studentObj) return;\
-                let placed = false;\
-                const frontRows = seatConfig.map((r, i) => r.isFront ? i : -1).filter(i => i !== -1);\
-                shuffleArray(frontRows);\
-\
-                for (const r of frontRows) \{\
-                    if (placed) break;\
-                    const seatOrder = Array.from(\{length: seatConfig[r].seats\}, (_, i) => i);\
-                    shuffleArray(seatOrder); \
-                    for (const c of seatOrder) \{\
-                        if (!isUnusable(r,c) && newChart[r][c] === null && isPlacementValid(studentObj, r, c, newChart, avoidPairs)) \{\
-                            newChart[r][c] = studentObj;\
-                            studentsToPlace = studentsToPlace.filter(s => s.id !== studentObj.id);\
-                            placed = true; break;\
-                        \}\
-                    \}\
-                \}\
-            \});\
-\
-            shuffleArray(studentsToPlace);\
-            \
-            for (const studentObj of studentsToPlace) \{\
-                const availableSeats = [];\
-                for (let r = 0; r < newChart.length; r++) \{\
-                    for (let c = 0; c < seatConfig[r].seats; c++) \{\
-                        if (!isUnusable(r,c) && newChart[r][c] === null) \{\
-                            availableSeats.push(\{r, c\});\
-                        \}\
-                    \}\
-                \}\
-                shuffleArray(availableSeats); \
-                for (const seat of availableSeats) \{\
-                     if (isPlacementValid(studentObj, seat.r, seat.c, newChart, avoidPairs)) \{\
-                        newChart[seat.r][seat.c] = studentObj;\
-                        break;\
-                    \}\
-                \}\
-            \}\
-            \
-            const stillUnplaced = students.filter(s => !newChart.flat().some(p => p && p.id === s.id));\
-            if (stillUnplaced.length > 0) \{\
-                notificationArea.textContent += `
-\f1 \'aa\'60\'b7\'4e\'a1\'47\'b3\'a1\'a4\'c0\'be\'c7\'a5\'cd
-\f0  ($\{stillUnplaced.map(s=>s.name).join(', ')\}) 
-\f1 \'a5\'bc\'af\'e0\'a7\'b9\'ac\'fc\'a6\'77\'b1\'c6\'a1\'41\'b1\'4e\'b9\'c1\'b8\'d5\'a9\'f1\'a4\'4a\'b3\'d1\'be\'6c\'aa\'c5\'a6\'ec\'a1\'43
-\f0 \\n`;\
-                stillUnplaced.forEach(studentObj => \{\
-                    for (let r = 0; r < newChart.length; r++) \{\
-                        for (let c = 0; c < seatConfig[r].seats; c++) \{\
-                            if (!isUnusable(r,c) && newChart[r][c] === null) \{\
-                                newChart[r][c] = studentObj; return;\
-                            \}\
-                        \}\
-                    \}\
-                \});\
-            \}\
-            displayChart(newChart);\
-        \}\
-        \
-        function init() \{\
-            monthSelect.addEventListener('change', updateChartTitle);\
-            generateBtn.addEventListener('click', () => \{\
-                if (isManualAdjustMode) \{ toggleManualAdjustMode(); \}\
-                generateSeatingChart();\
-            \});\
-            manualAdjustBtn.addEventListener('click', toggleManualAdjustMode);\
-            printBtn.addEventListener('click', () => window.print());\
-\
-            populateStudentDropdowns();\
-            updateChartTitle(); \
-            displayChart(seatConfig.map(() => Array(MAX_COLS).fill(null)));\
-        \}\
-\
-        init();\
-    \})();\
-    </script>\
-</body>\
-</html>\
-\
-}
+        @media print {
+            body { display: block; padding: 0; background-color: #fff; }
+            body * { visibility: hidden; }
+            .printable-area, .printable-area * { visibility: visible; }
+            .printable-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                padding: 20px !important;
+            }
+            .controls-container, #main-title-wrapper, .action-buttons-container, #chart-notification { display: none !important; }
+            .podium {
+                background-color: #8b5cf6 !important; 
+                color: white !important;
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+            }
+            .seat {
+                border: 1px solid #000 !important;
+                background-color: #fff !important;
+                page-break-inside: avoid;
+                box-shadow: none !important;
+                width: 90px !important;
+                height: 75px !important;
+            }
+            .student-id { font-size: 0.7rem !important; }
+            .student-name { font-size: 0.85rem !important; }
+            .unusable-seat {
+                border: 1px solid #ccc !important;
+                background-color: #e5e7eb !important;
+                color: #6b7280 !important;
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+                font-size: 0.75rem !important;
+            }
+            .empty-seat-placeholder {
+                border: 1px dashed #ccc !important;
+                background-color: #f9fafb !important;
+            }
+            #main-title {
+                background-image: linear-gradient(to right, #8b5cf6, #3b82f6) !important;
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+            }
+            h2 {
+                text-align: center !important; 
+                margin-bottom: 0.5rem !important;
+            }
+            #teacher-name-display {
+                background-color: #fbcfe8 !important;
+                color: #9d174d !important;
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+                padding: 0.25rem 0.5rem !important;
+                font-size: 0.9rem !important;
+            }
+            #warning-text-explicit {
+                background-color: #fef08a !important;
+                color: #c2410c !important;
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+                font-size: 0.8rem !important;
+                padding: 0.25rem 0.5rem !important;
+                margin-top: 0.25rem !important;
+            }
+            #seating-chart-container {
+                gap: 0.2rem !important; 
+                padding-top: 0.5rem !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container max-w-6xl bg-white p-6 rounded-lg shadow-xl">
+        <header id="main-title-wrapper" class="text-center mb-6">
+            <h1 id="main-title">Gloria老師導師班座位表</h1>
+        </header>
+        
+        <div class="controls-container mb-8 p-4 border border-gray-200 rounded-lg bg-gray-50">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-6">
+                <!-- Left Column for Controls -->
+                <div class="space-y-4">
+                    <div class="control-group">
+                        <label for="month-select" class="text-gray-700">選擇月份：</label>
+                        <select id="month-select" class="w-full">
+                            <option value="1">一月</option><option value="2">二月</option><option value="3">三月</option>
+                            <option value="4">四月</option><option value="5">五月</option><option value="6">六月</option>
+                            <option value="7">七月</option><option value="8">八月</option><option value="9">九月</option>
+                            <option value="10">十月</option><option value="11">十一月</option><option value="12">十二月</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label class="text-gray-700">優先排在前面學生 (最多3位):</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                            <select id="priority-front-1"><option value="">-- 無 --</option></select>
+                            <select id="priority-front-2"><option value="">-- 無 --</option></select>
+                            <select id="priority-front-3"><option value="">-- 無 --</option></select>
+                        </div>
+                    </div>
+                </div>
+                <!-- Right Column for Controls -->
+                <div class="space-y-4">
+                    <div class="control-group">
+                        <label class="text-gray-700">避免相鄰學生 (第1組):</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <select id="avoid-1a"><option value="">-- 學生A --</option></select>
+                            <select id="avoid-1b"><option value="">-- 學生B --</option></select>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="text-gray-700">避免相鄰學生 (第2組):</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <select id="avoid-2a"><option value="">-- 學生C --</option></select>
+                            <select id="avoid-2b"><option value="">-- 學生D --</option></select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+             <div class="action-buttons-container mt-6 flex flex-col sm:flex-row justify-center items-center gap-4">
+                <button id="generate-chart-btn" class="action-button py-2 px-6 w-full sm:w-auto">產生座位表</button>
+                <button id="manual-adjust-btn" class="secondary-button py-2 px-6 w-full sm:w-auto">手動調整座位</button>
+                <button id="print-chart-btn" class="secondary-button py-2 px-6 w-full sm:w-auto">座位表列印</button>
+            </div>
+        </div>
+        
+        <div id="chart-notification" class="mb-4 text-center text-red-600 font-medium"></div>
+        
+        <div class="printable-area">
+            <h2 id="seating-chart-title" class="text-2xl font-semibold text-center mb-1 text-gray-700"></h2>
+            <div class="text-center mb-2">
+                <p id="teacher-name-display" class="text-lg">導師：Gloria 吳秀蘭老師</p>
+            </div>
+            <p id="warning-text-explicit">未經導師許可，嚴禁任意更換座位！！</p>
+            
+            <div id="seating-chart-container" class="grid gap-2 justify-center mt-6"></div>
+            <div class="podium">黑板 / 講台</div>
+        </div>
+    </div>
+
+    <script>
+    (function() { // IIFE to prevent global scope pollution
+        const students = [
+            { id: "219008", name: "李尚錤" }, { id: "219022", name: "陳柏宇" }, { id: "219011", name: "林松侑" },
+            { id: "219019", name: "郭柏岑" }, { id: "219020", name: "陳友文" }, { id: "219024", name: "黃宥嘉" },
+            { id: "219029", name: "蘇奕齊" }, { id: "219016", name: "陳翊凱" }, { id: "219023", name: "黃冠澤" },
+            { id: "219021", name: "陳恆翊" }, { id: "219010", name: "林正勛" }, { id: "219027", name: "謝博安" },
+            { id: "219014", name: "林博宣" }, { id: "219002", name: "王宥鎧" }, { id: "219006", name: "朱彥霖" },
+            { id: "219013", name: "林冠穎" }, { id: "219018", name: "郭宥辰" }, { id: "219015", name: "林毅鑫" },
+            { id: "219004", name: "王尉丞" }, { id: "219012", name: "林冠廷" }, { id: "219001", name: "杜筱渝" },
+            { id: "219005", name: "王稟程" }, { id: "219003", name: "王韋鈞" }, { id: "219025", name: "廖晉佑" },
+            { id: "219026", name: "謝尚諭" }, { id: "219017", name: "莊文禾" }, { id: "219009", name: "李彥廷" }
+        ];
+
+        // Seat configuration: 6 columns x 5 rows
+        const seatConfig = [ 
+            { seats: 6, isFront: true }, 
+            { seats: 6, isFront: true }, 
+            { seats: 6, isFront: false },
+            { seats: 6, isFront: false }, 
+            { seats: 6, isFront: false }
+        ];
+        const MAX_COLS = 6; 
+        // First column (c:0), first seat (r:0) and fifth seat (r:4) are unusable
+        const unusableSeats = [{ r: 0, c: 0 }, { r: 4, c: 0 }]; 
+
+        // DOM Elements
+        const monthSelect = document.getElementById('month-select');
+        const seatingChartTitle = document.getElementById('seating-chart-title');
+        const seatingChartContainer = document.getElementById('seating-chart-container');
+        const generateBtn = document.getElementById('generate-chart-btn');
+        const notificationArea = document.getElementById('chart-notification');
+        const manualAdjustBtn = document.getElementById('manual-adjust-btn');
+        const printBtn = document.getElementById('print-chart-btn');
+        const prioritySelects = [
+            document.getElementById('priority-front-1'),
+            document.getElementById('priority-front-2'),
+            document.getElementById('priority-front-3')
+        ];
+        const avoidSelects = [
+            { a: document.getElementById('avoid-1a'), b: document.getElementById('avoid-1b') },
+            { a: document.getElementById('avoid-2a'), b: document.getElementById('avoid-2b') }
+        ];
+
+        let currentChartData = []; 
+        let isManualAdjustMode = false;
+        let firstSelectedSeatForSwap = null; 
+
+        // Utility & Core Functions
+        const isUnusable = (r, c) => unusableSeats.some(seat => seat.r === r && seat.c === c);
+        const shuffleArray = (array) => {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        };
+
+        function populateStudentDropdowns() {
+            const studentNames = students.map(s => s.name);
+            const allDropdowns = [...prioritySelects, ...avoidSelects.flatMap(p => [p.a, p.b])];
+            allDropdowns.forEach(select => {
+                if (!select) return;
+                const currentValue = select.value;
+                select.innerHTML = `<option value="">${select.children[0].textContent}</option>`; // Keep placeholder
+                studentNames.forEach(name => {
+                    select.innerHTML += `<option value="${name}">${name}</option>`;
+                });
+                select.value = currentValue;
+            });
+        }
+
+        function updateChartTitle() {
+            seatingChartTitle.textContent = `${monthSelect.value}月份 Gloria老師導師班座位表`;
+        }
+        
+        function displayChart(chartToDisplay) {
+            currentChartData = chartToDisplay; 
+            seatingChartContainer.innerHTML = ''; 
+            seatingChartContainer.style.gridTemplateColumns = `repeat(${MAX_COLS}, minmax(0, 1fr))`;
+
+            chartToDisplay.forEach((rowStudents, rowIndex) => {
+                for (let colIndex = 0; colIndex < MAX_COLS; colIndex++) {
+                    const seatDiv = document.createElement('div');
+                    seatDiv.dataset.row = rowIndex;
+                    seatDiv.dataset.col = colIndex;
+
+                    if (colIndex < seatConfig[rowIndex].seats) { 
+                        if (isUnusable(rowIndex, colIndex)) {
+                            seatDiv.className = 'unusable-seat';
+                            seatDiv.textContent = '不排位';
+                        } else {
+                            seatDiv.className = 'seat';
+                            const studentObject = rowStudents[colIndex];
+                            if (studentObject) {
+                                seatDiv.innerHTML = `<span class="student-id">${studentObject.id}</span><span class="student-name">${studentObject.name}</span>`;
+                            } else {
+                                seatDiv.classList.add('bg-gray-100'); 
+                            }
+                            if (isManualAdjustMode) {
+                                seatDiv.classList.add('manual-adjust-active');
+                                seatDiv.addEventListener('click', () => handleSeatClick(rowIndex, colIndex));
+                            }
+                            if (firstSelectedSeatForSwap && firstSelectedSeatForSwap.r === rowIndex && firstSelectedSeatForSwap.c === colIndex) {
+                                seatDiv.classList.add('selected-for-swap');
+                            }
+                        }
+                    } else { 
+                        seatDiv.className = 'empty-seat-placeholder';
+                    }
+                    seatingChartContainer.appendChild(seatDiv);
+                }
+            });
+        }
+
+        function handleSeatClick(r, c) {
+            if (!isManualAdjustMode || isUnusable(r,c)) return; 
+            const clickedSeatDiv = seatingChartContainer.querySelector(`[data-row='${r}'][data-col='${c}']`);
+
+            if (!firstSelectedSeatForSwap) {
+                firstSelectedSeatForSwap = { r, c, div: clickedSeatDiv };
+                clickedSeatDiv.classList.add('selected-for-swap');
+            } else {
+                if (firstSelectedSeatForSwap.r === r && firstSelectedSeatForSwap.c === c) {
+                    firstSelectedSeatForSwap.div.classList.remove('selected-for-swap');
+                    firstSelectedSeatForSwap = null;
+                    return;
+                }
+
+                const student1 = currentChartData[firstSelectedSeatForSwap.r][firstSelectedSeatForSwap.c];
+                const student2 = currentChartData[r][c];
+                currentChartData[firstSelectedSeatForSwap.r][firstSelectedSeatForSwap.c] = student2;
+                currentChartData[r][c] = student1;
+
+                firstSelectedSeatForSwap.div.classList.remove('selected-for-swap');
+                firstSelectedSeatForSwap = null;
+                displayChart(currentChartData); 
+            }
+        }
+
+        function toggleManualAdjustMode() {
+            isManualAdjustMode = !isManualAdjustMode;
+            manualAdjustBtn.textContent = isManualAdjustMode ? '完成調整' : '手動調整座位';
+            manualAdjustBtn.classList.toggle('action-button', isManualAdjustMode); 
+            manualAdjustBtn.classList.toggle('secondary-button', !isManualAdjustMode);
+            firstSelectedSeatForSwap = null; 
+            displayChart(currentChartData); 
+        }
+
+        function isPlacementValid(studentObj, r, c, chartLayout, avoidPairs) {
+            if (isUnusable(r,c)) return false;
+            const neighbors = [{ dr: -1, dc: 0 }, { dr: 1, dc: 0 }, { dr: 0, dc: -1 }, { dr: 0, dc: 1 }];
+            for (const neighbor of neighbors) {
+                const nr = r + neighbor.dr;
+                const nc = c + neighbor.dc;
+                if (nr >= 0 && nr < chartLayout.length && nc >= 0 && nc < MAX_COLS) {
+                    if (nc < seatConfig[nr].seats && !isUnusable(nr, nc)) {
+                        const neighborStudentObj = chartLayout[nr][nc];
+                        if (neighborStudentObj) { 
+                            for (const pair of avoidPairs) {
+                                if ((pair.student1Name === studentObj.name && pair.student2Name === neighborStudentObj.name) ||
+                                    (pair.student2Name === studentObj.name && pair.student1Name === neighborStudentObj.name)) {
+                                    return false; 
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return true; 
+        }
+        
+        function generateSeatingChart() {
+            notificationArea.textContent = ''; 
+            const { priorityFrontNames, avoidPairs } = {
+                priorityFrontNames: prioritySelects.map(s => s.value).filter(Boolean),
+                avoidPairs: avoidSelects.map(p => (p.a.value && p.b.value && p.a.value !== p.b.value) ? { student1Name: p.a.value, student2Name: p.b.value } : null).filter(Boolean)
+            };
+            
+            let studentsToPlace = [...students]; 
+            const newChart = seatConfig.map(() => Array(MAX_COLS).fill(null));
+
+            priorityFrontNames.forEach(name => {
+                const studentObj = students.find(s => s.name === name);
+                if (!studentObj) return;
+                let placed = false;
+                const frontRows = seatConfig.map((r, i) => r.isFront ? i : -1).filter(i => i !== -1);
+                shuffleArray(frontRows);
+
+                for (const r of frontRows) {
+                    if (placed) break;
+                    const seatOrder = Array.from({length: seatConfig[r].seats}, (_, i) => i);
+                    shuffleArray(seatOrder); 
+                    for (const c of seatOrder) {
+                        if (!isUnusable(r,c) && newChart[r][c] === null && isPlacementValid(studentObj, r, c, newChart, avoidPairs)) {
+                            newChart[r][c] = studentObj;
+                            studentsToPlace = studentsToPlace.filter(s => s.id !== studentObj.id);
+                            placed = true; break;
+                        }
+                    }
+                }
+            });
+
+            shuffleArray(studentsToPlace);
+            
+            for (const studentObj of studentsToPlace) {
+                const availableSeats = [];
+                for (let r = 0; r < newChart.length; r++) {
+                    for (let c = 0; c < seatConfig[r].seats; c++) {
+                        if (!isUnusable(r,c) && newChart[r][c] === null) {
+                            availableSeats.push({r, c});
+                        }
+                    }
+                }
+                shuffleArray(availableSeats); 
+                for (const seat of availableSeats) {
+                     if (isPlacementValid(studentObj, seat.r, seat.c, newChart, avoidPairs)) {
+                        newChart[seat.r][seat.c] = studentObj;
+                        break;
+                    }
+                }
+            }
+            
+            const stillUnplaced = students.filter(s => !newChart.flat().some(p => p && p.id === s.id));
+            if (stillUnplaced.length > 0) {
+                notificationArea.textContent += `注意：部分學生 (${stillUnplaced.map(s=>s.name).join(', ')}) 未能完美安排，將嘗試放入剩餘空位。\n`;
+                stillUnplaced.forEach(studentObj => {
+                    for (let r = 0; r < newChart.length; r++) {
+                        for (let c = 0; c < seatConfig[r].seats; c++) {
+                            if (!isUnusable(r,c) && newChart[r][c] === null) {
+                                newChart[r][c] = studentObj; return;
+                            }
+                        }
+                    }
+                });
+            }
+            displayChart(newChart);
+        }
+        
+        function init() {
+            monthSelect.addEventListener('change', updateChartTitle);
+            generateBtn.addEventListener('click', () => {
+                if (isManualAdjustMode) { toggleManualAdjustMode(); }
+                generateSeatingChart();
+            });
+            manualAdjustBtn.addEventListener('click', toggleManualAdjustMode);
+            printBtn.addEventListener('click', () => window.print());
+
+            populateStudentDropdowns();
+            updateChartTitle(); 
+            displayChart(seatConfig.map(() => Array(MAX_COLS).fill(null)));
+        }
+
+        init();
+    })();
+    </script>
+</body>
+</html>
+
